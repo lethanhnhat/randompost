@@ -1,0 +1,23 @@
+function sb_theme_custom_init() {
+    global $wp;
+    $wp->add_query_var('random');
+    add_rewrite_rule('random/?$', 'index.php?random=1', 'top');
+}
+add_action('init', 'sb_theme_custom_init');
+ 
+function sb_theme_custom_template_redirect() {
+    if(get_query_var('random') == 1) {
+        $args = array(
+            'posts_per_page' => 1,
+            'orderby' => 'rand',
+            'post_type' => 'post'
+        );
+        $query = new WP_Query($args);
+        if($query->have_posts()) {
+            $random = $query->posts[0];
+            wp_redirect(get_permalink($random->ID), 307);
+            exit;
+        }
+    }
+}
+add_action('template_redirect', 'sb_theme_custom_template_redirect');
